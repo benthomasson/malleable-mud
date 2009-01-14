@@ -27,13 +27,16 @@ magenta_background = "\x1B[45m"
 cyan_background = "\x1B[46m"
 white_background = "\x1B[47m"
 
+def lookup(x, notFound=None):
+    if memory.has_key(x):
+        return memory[x]
+    else:
+        return notFound
+
 def say(*args):
     print "%sYou say:" % cyan,
     for x in args:
-        if memory.has_key(x):
-            print memory[x]
-        else:
-            print x,
+            print lookup(x,notFound=x),
     print clear
 
 def note(name, value):
@@ -79,9 +82,12 @@ def nocolor():
 def prompt():
     print "%s%s>%s" % (red, underline, clear ),
     commandline = raw_input()
-    splitcommand = string.split(commandline," ")
+    splitcommand = string.split(commandline)
     if commands.has_key(splitcommand[0]):
-        apply(commands[splitcommand[0]],splitcommand[1:])
+        try:
+            apply(commands[splitcommand[0]],splitcommand[1:])
+        except Exception, error:
+            print "%sWhat?%s" % (red,clear)
     else:
         print "%sWhat?%s" % (red,clear)
     
