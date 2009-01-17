@@ -2,7 +2,9 @@
 
 
 class Character():
-    pass
+
+    def __init__(self,name):
+        self.name = name
 
 class Item():
     pass

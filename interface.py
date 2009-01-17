@@ -47,6 +47,9 @@ class Interface(Color):
         finally:
             pass
 
+     def print(self,string):
+        print string
+
 
        
 
