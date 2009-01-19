@@ -1,0 +1,16 @@
+--- !ditz.rubyforge.org,2008-03-06/project 
+name: malleable-mud
+version: "0.5"
+components: 
+- !ditz.rubyforge.org,2008-03-06/component 
+  name: malleable-mud
+releases: 
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: "0.0"
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-01-19 22:00:11.261387 Z
+    - Benjamin Thomasson <ben.thomasson@gmail.com>
+    - created
+    - First release
