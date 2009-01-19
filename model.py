@@ -1,10 +1,18 @@
 """model module.  Contains definitions for the game model"""
 
+def say(*args):
+    print "You say: '",
+    for x in args:
+        print x,
+    print ".'"
 
 class Character():
 
-    def __init__(self,name):
+    commands = {}
+
+    def __init__(self,name='Nobody'):
         self.name = name
+        self.commands = { 'say' : say}
 
 class Item():
     pass
@@ -15,8 +23,4 @@ class Room():
 class Player():
     pass
 
-class World():
-    pass
 
-
-print 'loaded'

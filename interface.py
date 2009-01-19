@@ -4,7 +4,9 @@ import string
 import sys
 import cPickle
 import commands
+import model
 import world
+import traceback
 
 class Color():
 
@@ -69,7 +71,8 @@ class Interface(Color):
                      'color'    : self.color,
                      'nocolor'  : self.nocolor,
                      'objects'  : self.objects,
-                     'setobject' : self.setobject, }
+                     'setobject' : self.setobject, 
+                     'create' : self.create, }
         self.object = None
 
     def lookup(self,x, notFound=None):
@@ -83,12 +86,17 @@ class Interface(Color):
         commandline = raw_input()
         try:
             splitcommand = string.split(commandline)
+            if len(splitcommand) == 0: return
             if self.commands.has_key(splitcommand[0]):
                 apply(self.commands[splitcommand[0]],splitcommand[1:])
+            elif self.object is not None and self.object.commands.has_key(splitcommand[0]):
+                apply(self.object.commands[splitcommand[0]],splitcommand[1:])
             else:
                 print "%sWhat?%s" % (self.red,self.clear)
-        #except Exception, error:
-        #    print "%sWhat?%s" % (self.red,self.clear)
+        except Exception, error:
+            print "%sWhat?%s" % (self.red,self.clear)
+            print "Error: ", error
+            traceback.print_tb(sys.exc_info()[2])
         finally:
             pass
 
@@ -103,5 +111,9 @@ class Interface(Color):
 
     def setobject(self,x):
         self.object = world.world.getObject(x)
+
+    def create(self,type="Character"):
+        world.world.storeObject(eval("model.%s()" % (type,)))
+        print "Done!"
            
 

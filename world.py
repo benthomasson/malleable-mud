@@ -4,8 +4,8 @@ import shelve
 
 class World():
 
-    def __init__(self):
-        self.world = shelve.open("world")
+    def __init__(self,db='world'):
+        self.world = shelve.open(db,writeback=True)
         if not self.world.has_key('nextId'):
             self.world['nextId'] = 1
 
