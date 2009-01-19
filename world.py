@@ -1,11 +1,14 @@
 #!/usr/bin/python
 
 import shelve
+import time
 
 class World():
 
     def __init__(self,db='world'):
+        start = time.time()
         self.world = shelve.open(db,writeback=True)
+        print "Load: ", time.time() - start
         if not self.world.has_key('nextId'):
             self.world['nextId'] = 1
 
@@ -27,7 +30,15 @@ class World():
             return self.world[id]
 
     def close(self):
+        start = time.time()
         self.world.close()
+        print "Close: ", time.time() - start
+
+    def sync(self):
+        """Sync the world to the on disk db"""
+        start = time.time()
+        self.world.sync()
+        print "Sync: ", time.time() - start
 
 world = World()
 

@@ -14,6 +14,7 @@ class Color():
         self.color()
 
     def color(self):
+        """Enable color"""
         self.clear = "\x1B[0m"
         self.bold = "\x1B[1m"
         self.italics = "\x1B[3m"
@@ -37,6 +38,7 @@ class Color():
         self.white_background = "\x1B[47m"
 
     def nocolor(self):
+        """Disable color"""
         self.clear = ""
         self.bold = ""
         self.italics = ""
@@ -65,7 +67,8 @@ class Interface(Color):
         Color.__init__(self)
         self.memory = { }
         self.commands = { 
-                     'exit'     : sys.exit,
+                     'exit'     : self.exit,
+                     'sync'     : world.world.sync,
                      '?'        : self.help,
                      'help'     : self.help,
                      'color'    : self.color,
@@ -81,18 +84,28 @@ class Interface(Color):
         else:
             return notFound
 
+    def getCommand(self,command):
+        if self.commands.has_key(command):
+            return self.commands[command]
+        else:
+            return None
+
     def prompt(self):
         print "%s%s%s>%s" % (self.red, self.underline, self.object, self.clear ),
         commandline = raw_input()
         try:
             splitcommand = string.split(commandline)
             if len(splitcommand) == 0: return
-            if self.commands.has_key(splitcommand[0]):
-                apply(self.commands[splitcommand[0]],splitcommand[1:])
-            elif self.object is not None and self.object.commands.has_key(splitcommand[0]):
-                apply(self.object.commands[splitcommand[0]],splitcommand[1:])
-            else:
-                print "%sWhat?%s" % (self.red,self.clear)
+            command = self.getCommand(splitcommand[0])
+            if command is not None:
+                apply(command,splitcommand[1:])
+                return
+            if self.object is not None: 
+                command = self.object.getCommand(splitcommand[0])
+                if command is not None:
+                    apply(command,splitcommand[1:])
+                    return
+            print "%sWhat?%s" % (self.red,self.clear)
         except Exception, error:
             print "%sWhat?%s" % (self.red,self.clear)
             print "Error: ", error
@@ -100,20 +113,33 @@ class Interface(Color):
         finally:
             pass
 
-    def help(obj):
+    def help(self):
+        """Print the help for commands"""
         print "Commands: "
-        for x in sorted(obj.commands.keys()):
-            print x
+        for (name,command) in sorted(self.commands.items()):
+            print "%-*s - %s" % (10,name,command.__doc__)
+        if self.object is not None:
+            for (name,command) in sorted(self.object.getCommands()):
+                print "%-*s - %s" % (10,name,command.__doc__)
 
     def objects(self):
+        """Get a list of all the objects"""
         for x in world.world.world.keys():
             print "%s: %s" % (x,world.world.getObject(x))
 
     def setobject(self,x):
+        """Change the object you control"""
         self.object = world.world.getObject(x)
 
     def create(self,type="Character"):
+        """Create a new object"""
         world.world.storeObject(eval("model.%s()" % (type,)))
         print "Done!"
+
+    def exit(self):
+        """Exit the game"""
+        world.world.close()
+        sys.exit()
+
            
 
