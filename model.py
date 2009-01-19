@@ -1,6 +1,6 @@
 """model module.  Contains definitions for the game model"""
 
-def say(*args):
+def say(self,*args):
     """Speak"""
     print "You say: '",
     for x in args:
@@ -21,8 +21,8 @@ class Character():
     def __str__(self):
         return self.name
 
-    def applyCommand(self,name,args):
-        apply(self.getCommand(name),args)
+    def applyCommand(self,command,args):
+        apply(command,[ self ] + args)
 
     def getCommand(self,name):
         if self.commands.has_key(name):
@@ -38,7 +38,6 @@ class Character():
             commands += set.items()
         return commands
         
-
 class Item():
     pass
 

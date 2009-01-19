@@ -3,14 +3,22 @@
 import sys
 import os
 
+def nop(*args):
+    return None
+
+def empty(*args):
+    return ['sync']
+
 class CommandLineInterface():
 
-    def __init__(self):
+    def __init__(self,helpCallBack=nop,tabCallBack=empty):
         self.history = []
         self.historyIndex = 0
         self.out = sys.stdout
         self.index = 0
         self.line = []
+        self.helpCallBack = helpCallBack
+        self.tabCallBack = tabCallBack
 
     def enableRaw(self):
         os.spawnlp(os.P_WAIT,'/bin/stty','/bin/stty','raw','-echo')
@@ -44,14 +52,17 @@ class CommandLineInterface():
             self.out.write("\b")
 
     def eraseChar(self):
-        self.index+=-1
-        self.line.pop(self.index)
-        self.out.write("\b \b")
-        for x in range(self.index,len(self.line)):
-            self.out.write(self.line[x])
-        self.out.write(" \b")
-        for x in range(self.index,len(self.line)):
-            self.out.write("\b")
+        if self.index > len(self.line):
+            self.index = len(self.line)
+        if self.index > 0:
+            self.index+=-1
+            self.line.pop(self.index)
+            self.out.write("\b \b")
+            for x in range(self.index,len(self.line)):
+                self.out.write(self.line[x])
+            self.out.write(" \b")
+            for x in range(self.index,len(self.line)):
+                self.out.write("\b")
     
     def eraseLine(self):
         for x in range(self.index,len(self.line)):
@@ -86,11 +97,26 @@ class CommandLineInterface():
             self.line = self.history[self.historyIndex][:]
             self.index = len(self.line) 
             self.out.write("".join(self.line))
+    
+    def tabComplete(self):
+        commands = apply(self.tabCallBack,["".join(self.line)])
+        num = len(commands)
+        if num == 0:
+            pass
+        elif num == 1:
+            self.line = list(commands[0][0])
+            for x in range(self.index,len(self.line)):
+                self.out.write(self.line[x])
+            self.index = len(self.line)
+            self.appendChar(" ")
+        else:
+            pass
 
     def getCommand(self):
         done = False
         self.enableRaw()
         self.line = []
+        self.index = 0
         while not done:
             char = sys.stdin.read(1)
             num = ord(char)
@@ -121,6 +147,8 @@ class CommandLineInterface():
             elif num == 8 or num == 127:
                 if self.index > 0:
                     self.eraseChar()
+            elif num == 9: #Tab
+                self.tabComplete()
             elif num == 13 or num == 10:
                 self.history.append(self.line)
                 self.historyIndex = len(self.history)
@@ -138,15 +166,4 @@ class CommandLineInterface():
         self.disableRaw()
         self.out.write("\n")
         return "".join(self.line)
-
-cli = CommandLineInterface()
-
-done = False
-while not done:
-    command = cli.getCommand()
-    sys.stdout.write("Command: %s\n" % command)
-    if command == "end":
-        done = True
-
-
 

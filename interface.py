@@ -7,11 +7,13 @@ import commands
 import model
 import world
 import traceback
+import cli
 
 class Color():
 
     def __init__(self):
         self.color()
+        self.cli = cli.CommandLineInterface(tabCallBack=self.getCommands)
 
     def color(self):
         """Enable color"""
@@ -90,20 +92,23 @@ class Interface(Color):
         else:
             return None
 
+    def applyCommand(self,command,args):
+        apply(command,args)
+
     def prompt(self):
         print "%s%s%s>%s" % (self.red, self.underline, self.object, self.clear ),
-        commandline = raw_input()
+        commandline = self.cli.getCommand()
         try:
             splitcommand = string.split(commandline)
             if len(splitcommand) == 0: return
             command = self.getCommand(splitcommand[0])
             if command is not None:
-                apply(command,splitcommand[1:])
+                self.applyCommand(command,splitcommand[1:])
                 return
             if self.object is not None: 
                 command = self.object.getCommand(splitcommand[0])
                 if command is not None:
-                    apply(command,splitcommand[1:])
+                    self.object.applyCommand(command,splitcommand[1:])
                     return
             print "%sWhat?%s" % (self.red,self.clear)
         except Exception, error:
@@ -112,6 +117,13 @@ class Interface(Color):
             traceback.print_tb(sys.exc_info()[2])
         finally:
             pass
+    
+    def getCommands(self,prefix):
+        commands = []
+        commands += self.commands.items()
+        if self.object is not None:
+            commands += self.object.getCommands()
+        return filter(lambda x: x[0].startswith(prefix),commands)
 
     def help(self):
         """Print the help for commands"""
