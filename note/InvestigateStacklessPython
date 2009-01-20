@@ -1,0 +1,11 @@
+
+InvestigateStacklessPython
+
+It looks like stackless python is the way to go for MM.  I could either work on things
+that are not affected by the scheduler or I could do some research into stackless and
+build a telnet server with it.  I would prefer to try out the major parts together
+as soon as possible before getting into MUD coding.   So this is probably a good time.
+
+
+
+

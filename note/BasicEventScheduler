@@ -1,0 +1,6 @@
+
+BasicEventScheduler
+
+Build a basic event scheduler that polls objects for actions to complete.  Objects could schedule when to poll them again to reduce polling load.
+
+

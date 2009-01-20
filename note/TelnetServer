@@ -1,0 +1,7 @@
+
+TelnetServer
+
+Build a telnet server that allows users to connect to telnet interfaces.  The system would work by polling telnet connections for commands and
+would return control to the main loop so other actions can execute.
+
+
