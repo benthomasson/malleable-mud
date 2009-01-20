@@ -65,19 +65,20 @@ class Color():
 
 class Interface(Color):
 
-    def __init__(self):
+    def __init__(self,world):
         Color.__init__(self)
         self.memory = { }
+        self.world = world
         self.commands = { 
-                     'exit'     : self.exit,
-                     'sync'     : world.world.sync,
-                     '?'        : self.help,
-                     'help'     : self.help,
-                     'color'    : self.color,
-                     'nocolor'  : self.nocolor,
-                     'objects'  : self.objects,
+                     'exit'      : self.exit,
+                     'sync'      : self.world.sync,
+                     '?'         : self.help,
+                     'help'      : self.help,
+                     'color'     : self.color,
+                     'nocolor'   : self.nocolor,
+                     'objects'   : self.objects,
                      'setobject' : self.setobject, 
-                     'create' : self.create, }
+                     'create'    : self.create, }
         self.object = None
 
     def lookup(self,x, notFound=None):
@@ -136,22 +137,26 @@ class Interface(Color):
 
     def objects(self):
         """Get a list of all the objects"""
-        for x in world.world.world.keys():
-            print "%s: %s" % (x,world.world.getObject(x))
+        for x in self.world.world.keys():
+            print "%s: %s" % (x,self.world.getObject(x))
 
     def setobject(self,x):
         """Change the object you control"""
-        self.object = world.world.getObject(x)
+        self.object = self.world.getObject(x)
 
     def create(self,type="Character"):
         """Create a new object"""
-        world.world.storeObject(eval("model.%s()" % (type,)))
+        self.world.storeObject(eval("model.%s()" % (type,)))
         print "Done!"
 
     def exit(self):
         """Exit the game"""
-        world.world.close()
+        self.world.close()
         sys.exit()
 
-           
+    def reload(self):
+        """Reload the code"""
+        reload(cli)
+        reload(model)
+        print "Reload complete"
 

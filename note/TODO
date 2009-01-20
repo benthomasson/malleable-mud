@@ -1,9 +1,18 @@
 
 TODO
 
-CliTabCompletion
+* CliTabCompletion
+* QuestionMarkHelp
+* BasicEventScheduler
+* TelnetServer
+* PlayerCommands
+* CreationCommands
+* CustomizationCommands
+
+
 
 DONE
 
+* ReloadCode
 
 

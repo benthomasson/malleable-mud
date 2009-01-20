@@ -1,6 +1,9 @@
 
 CliTabCompletion
 
-Add tab completion to cli.py
+* Add tab completion to cli.py. (done)
+* Finish tab-completion with command subset display and reprompt.
+
+
 
 

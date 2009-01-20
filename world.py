@@ -37,8 +37,14 @@ class World():
     def sync(self):
         """Sync the world to the on disk db"""
         start = time.time()
-        self.world.sync()
+        world = self.world
+        if world.writeback and world.cache:
+            world.writeback = False
+            for key, entry in world.cache.iteritems():
+                world[key] = entry
+            world.writeback = True
+        if hasattr(world.dict, 'sync'):
+            world.dict.sync()
         print "Sync: ", time.time() - start
 
-world = World()
 

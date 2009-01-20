@@ -9,9 +9,16 @@ def say(self,*args):
 
 talking = { 'say' : say }
 
+def customize(self,name,value):
+    """Customize an object"""
+    self.__dict__[name] = value
+
+customizable = { 'customize': customize }
+
 class Character():
 
-    commandSets = { 'talking' : talking }
+    commandSets = { 'talking' : talking, 
+                    'customizable' : customizable }
     commands = { } 
 
     def __init__(self,name='Nobody'):
