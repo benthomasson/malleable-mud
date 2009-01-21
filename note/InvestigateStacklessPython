@@ -6,6 +6,9 @@ that are not affected by the scheduler or I could do some research into stackles
 build a telnet server with it.  I would prefer to try out the major parts together
 as soon as possible before getting into MUD coding.   So this is probably a good time.
 
+Stackless is awesome.   Stackless can be used as the scheduler for the game itself.  Each object will have a run method
+that will get scheduled to run.
+
 
 
 

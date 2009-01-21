@@ -1,0 +1,6 @@
+
+ActorModel
+
+Implement the ActorModel as the architecture for MM.  This will work well both for pickling and for stackless.
+
+
