@@ -1,29 +1,32 @@
 #!/usr/local/bin/python
 
 import stackless
+import messages
+import actor
 
-class Object():
-    
-    def __init__(self,id):
-        self.id = id
-        stackless.tasklet(self.run)()
+world = None
+
+class Scheduler(actor.Actor):
+
+    def __init__(self,objects=[],interfaces=[]):
+        actor.Actor.__init__(self)
+        self.objects = objects[:]
+        self.interfaces = interfaces[:]
+        self.update = messages.Update()
+
+    def addObject(self,id):
+        self.objects.append(id)
+
+    def addObject(self,id):
+        self.interfaces.append(id)
 
     def run(self):
+        global world
         while 1:
-            print "Running %d" % self.id
+            for id in self.objects:
+                world.sendMessage(id,self.update)
             stackless.schedule()
+                
 
-class Scheduler():
 
-    def run(self):
-        stackless.run()        
-
-Object(1)
-Object(2)
-Object(3)
-Object(4)
-Object(5)
-Object(6)
-
-Scheduler().run()
 

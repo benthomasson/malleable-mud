@@ -8,6 +8,9 @@ import model
 import world
 import traceback
 import cli
+import actor
+import messages
+import stackless
 
 class Color():
 
@@ -63,10 +66,11 @@ class Color():
         self.cyan_background = ""
         self.white_background = ""
 
-class Interface(Color):
+class Interface(Color,actor.Actor):
 
     def __init__(self,world):
         Color.__init__(self)
+        actor.Actor.__init__(self)
         self.memory = { }
         self.world = world
         self.commands = { 
@@ -80,6 +84,7 @@ class Interface(Color):
                      'setobject' : self.setobject, 
                      'create'    : self.create, }
         self.object = None
+        self.out = sys.stdout
 
     def lookup(self,x, notFound=None):
         if self.memory.has_key(x):
@@ -97,7 +102,8 @@ class Interface(Color):
         apply(command,args)
 
     def prompt(self):
-        print "%s%s%s>%s" % (self.red, self.underline, self.object, self.clear ),
+        self.out.write( "\n%s%s%s>%s" % (self.red, self.underline, self.object, self.clear ))
+        self.out.flush()
         commandline = self.cli.getCommand()
         try:
             splitcommand = string.split(commandline)
@@ -111,10 +117,10 @@ class Interface(Color):
                 if command is not None:
                     self.object.applyCommand(command,splitcommand[1:])
                     return
-            print "%sWhat?%s" % (self.red,self.clear)
+            self.out.write( "\n%sWhat?%s" % (self.red,self.clear) )
         except Exception, error:
-            print "%sWhat?%s" % (self.red,self.clear)
-            print "Error: ", error
+            self.out.write( "\n%sWhat?%s" % (self.red,self.clear) )
+            self.out.write( "\nError: ", error ) 
             traceback.print_tb(sys.exc_info()[2])
         finally:
             pass
@@ -128,17 +134,17 @@ class Interface(Color):
 
     def help(self):
         """Print the help for commands"""
-        print "Commands: "
+        self.out.write( "\nCommands: " )
         for (name,command) in sorted(self.commands.items()):
-            print "%-*s - %s" % (10,name,command.__doc__)
+            self.out.write( "\n%-*s - %s" % (10,name,command.__doc__) )
         if self.object is not None:
             for (name,command) in sorted(self.object.getCommands()):
-                print "%-*s - %s" % (10,name,command.__doc__)
+                self.out.write( "\n%-*s - %s" % (10,name,command.__doc__) )
 
     def objects(self):
         """Get a list of all the objects"""
         for x in self.world.world.keys():
-            print "%s: %s" % (x,self.world.getObject(x))
+            self.out.write( "\n%s: %s" % (x,self.world.getObject(x)) )
 
     def setobject(self,x):
         """Change the object you control"""
@@ -147,7 +153,7 @@ class Interface(Color):
     def create(self,type="Character"):
         """Create a new object"""
         self.world.storeObject(eval("model.%s()" % (type,)))
-        print "Done!"
+        self.out.write( "\nDone!" )
 
     def exit(self):
         """Exit the game"""
@@ -158,5 +164,14 @@ class Interface(Color):
         """Reload the code"""
         reload(cli)
         reload(model)
-        print "Reload complete"
+        self.out.write( "\nReload complete" )
+
+    def run(self):
+        """Get a command"""
+        while 1:
+            self.prompt()
+            #print "interface schedule"
+            stackless.schedule()
+
+
 

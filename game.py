@@ -5,9 +5,16 @@ import model
 import world
 import cli
 import model
+import scheduler
+import stackless
+import sandman
 
 w = world.World()       
 i = interface.Interface(w)
+sandman = sandman.Sandman(0.001)
+
+scheduler.world = w
+s = scheduler.Scheduler()
 
 def reloadCode():
     """Reload the code"""
@@ -19,6 +26,6 @@ def reloadCode():
 
 i.commands['reload'] = reloadCode
 
-while True:
-    i.prompt()
+stackless.run()
+
 

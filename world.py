@@ -29,6 +29,13 @@ class World():
         else:
             return self.world[id]
 
+    def hasObject(self,id):
+        return self.world.has_key(id)
+
+    def sendMessage(self,id,message):
+        if self.world.has_key(id) and self.world[id].channel:
+                self.world[id].channel.send(message)
+
     def close(self):
         start = time.time()
         self.world.close()

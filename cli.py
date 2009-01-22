@@ -2,6 +2,9 @@
 
 import sys
 import os
+import stackless
+import select
+import time
 
 def nop(*args):
     return None
@@ -30,16 +33,19 @@ class CommandLineInterface():
         if self.index > 0:
             self.index += -1
             self.out.write("\x1B\x5B\x44")
+        self.out.flush()
 
     def moveRight(self):
         if self.index < len(self.line):
             self.index += 1
             self.out.write("\x1B\x5B\x43")
+        self.out.flush()
 
     def appendChar(self,char):
         self.out.write(char)
         self.line.append(char)
         self.index+=1
+        self.out.flush()
 
     def insertChar(self,char):
         self.line.insert(self.index,char)
@@ -50,6 +56,7 @@ class CommandLineInterface():
         self.out.write(" \b")
         for x in range(self.index,len(self.line)):
             self.out.write("\b")
+        self.out.flush()
 
     def eraseChar(self):
         if self.index > len(self.line):
@@ -63,6 +70,7 @@ class CommandLineInterface():
             self.out.write(" \b")
             for x in range(self.index,len(self.line)):
                 self.out.write("\b")
+        self.out.flush()
     
     def eraseLine(self):
         for x in range(self.index,len(self.line)):
@@ -71,16 +79,19 @@ class CommandLineInterface():
             self.out.write("\b \b")
         self.line = []
         self.index = 0
+        self.out.flush()
 
     def moveToStart(self):
         for x in range(0,self.index):
             self.out.write("\b")
         self.index = 0
+        self.out.flush()
 
     def moveToEnd(self):
         for x in range(self.index,len(self.line)):
             self.out.write(self.line[x])
         self.index = len(self.line)
+        self.out.flush()
     
     def previousHistoryCommand(self):
         if self.historyIndex > 0:
@@ -89,6 +100,7 @@ class CommandLineInterface():
             self.line = self.history[self.historyIndex][:]
             self.index = len(self.line) 
             self.out.write("".join(self.line))
+        self.out.flush()
     
     def nextHistoryCommand(self):
         if self.historyIndex < len(self.history) - 1:
@@ -97,6 +109,7 @@ class CommandLineInterface():
             self.line = self.history[self.historyIndex][:]
             self.index = len(self.line) 
             self.out.write("".join(self.line))
+        self.out.flush()
     
     def tabComplete(self):
         commands = apply(self.tabCallBack,["".join(self.line)])
@@ -111,6 +124,7 @@ class CommandLineInterface():
             self.appendChar(" ")
         else:
             pass
+        self.out.flush()
 
     def getCommand(self):
         done = False
@@ -118,6 +132,10 @@ class CommandLineInterface():
         self.line = []
         self.index = 0
         while not done:
+            stackless.schedule()
+            if not select.select([sys.stdin],[],[],0)[0]:
+                continue
+            #print "Reading"
             char = sys.stdin.read(1)
             num = ord(char)
             #print num
@@ -153,6 +171,7 @@ class CommandLineInterface():
                 self.history.append(self.line)
                 self.historyIndex = len(self.history)
                 done = True
+                break
             elif num == 14:
                 pass
             elif num == 16:
@@ -165,5 +184,8 @@ class CommandLineInterface():
 
         self.disableRaw()
         self.out.write("\n")
+        self.out.flush()
         return "".join(self.line)
+
+
 
