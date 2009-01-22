@@ -151,7 +151,7 @@ class CommandLineInterface():
                 elif command == 65: #Down arrow
                     self.previousHistoryCommand()
                 else:
-                    self.out.write(num)
+                    self.out.write(repr(num))
             elif num == 1:   #Control-A
                 self.moveToStart()
             elif num == 5:   #Control-E

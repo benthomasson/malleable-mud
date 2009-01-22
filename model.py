@@ -1,32 +1,28 @@
 """model module.  Contains definitions for the game model"""
 
-def say(self,*args):
-    """Speak"""
-    print "You say: '",
-    for x in args:
-        print x,
-    print ".'"
+import actor
+import messages
+import pickle
 
-talking = { 'say' : say }
+scheduler = None
+world = None
 
-def customize(self,name,value):
-    """Customize an object"""
-    self.__dict__[name] = value
-
-customizable = { 'customize': customize }
-
-class Character():
-
-    commandSets = { 'talking' : talking, 
-                    'customizable' : customizable }
-    commands = { } 
+class Character(actor.Actor):
 
     def __init__(self,name='Nobody'):
+        global scheduler, world
+        actor.Actor.__init__(self)
         self.name = name
-        self.commands = { }
+        self.mycommands = { }
+        if world: world.storeObject(self)
+        if scheduler: scheduler.addObject(self.id)
 
     def __str__(self):
         return self.name
+
+    def __setstate__(self,dict):
+        actor.Actor.__setstate__(self,dict)
+        if scheduler: scheduler.addObject(self.id)
 
     def applyCommand(self,command,args):
         apply(command,[ self ] + args)
@@ -34,17 +30,39 @@ class Character():
     def getCommand(self,name):
         if self.commands.has_key(name):
             return self.commands[name]
-        for set in self.commandSets.values():
-            if set.has_key(name):
-                return set[name]
+        if self.mycommands.has_key(name):
+            return self.mycommands[name]
         return None
 
     def getCommands(self):
-        commands = self.commands.items()
-        for (name, set) in self.commandSets.items():
-            commands += set.items()
-        return commands
-        
+        return self.commands.items() + self.mycommands.items()
+
+    def say(self,*args):
+        """Speak"""
+        print "You say: '",
+        for x in args:
+            print x,
+        print ".'"
+
+    def customize(self,name,value):
+        """Customize an object"""
+        self.__dict__[name] = value
+
+    def dump(self):
+        print self.__dict__
+        print pickle.dumps(self)
+
+    def update(self,message):
+        """Handle an update message"""
+        #print(self.id)
+        pass
+
+Character.commands = {  'say' : Character.say,
+                        'customize' : Character.customize, 
+                        'dump' : Character.dump, }
+
+Character.messageHandler = { 'UPDATE' : Character.update, }
+
 class Item():
     pass
 

@@ -19,5 +19,14 @@ class Actor():
         else:
             print "Unknown message: %s" % message
 
+    def __getstate__(self):
+        dict = self.__dict__.copy()
+        dict['channel'] = None
+        dict['task'] = None
+        return dict
 
-
+    def __setstate__(self,dict):
+        self.__dict__ = dict
+        self.channel = stackless.channel()
+        self.task = stackless.tasklet(self.run)()
+        return

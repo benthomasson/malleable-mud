@@ -73,16 +73,6 @@ class Interface(Color,actor.Actor):
         actor.Actor.__init__(self)
         self.memory = { }
         self.world = world
-        self.commands = { 
-                     'exit'      : self.exit,
-                     'sync'      : self.world.sync,
-                     '?'         : self.help,
-                     'help'      : self.help,
-                     'color'     : self.color,
-                     'nocolor'   : self.nocolor,
-                     'objects'   : self.objects,
-                     'setobject' : self.setobject, 
-                     'create'    : self.create, }
         self.object = None
         self.out = sys.stdout
 
@@ -99,7 +89,7 @@ class Interface(Color,actor.Actor):
             return None
 
     def applyCommand(self,command,args):
-        apply(command,args)
+        apply(command,[ self ] + args)
 
     def prompt(self):
         self.out.write( "\n%s%s%s>%s" % (self.red, self.underline, self.object, self.clear ))
@@ -120,7 +110,7 @@ class Interface(Color,actor.Actor):
             self.out.write( "\n%sWhat?%s" % (self.red,self.clear) )
         except Exception, error:
             self.out.write( "\n%sWhat?%s" % (self.red,self.clear) )
-            self.out.write( "\nError: ", error ) 
+            self.out.write( "\nError: %s" % error ) 
             traceback.print_tb(sys.exc_info()[2])
         finally:
             pass
@@ -143,6 +133,7 @@ class Interface(Color,actor.Actor):
 
     def objects(self):
         """Get a list of all the objects"""
+        self.out.write("World Objects\n")
         for x in self.world.world.keys():
             self.out.write( "\n%s: %s" % (x,self.world.getObject(x)) )
 
@@ -166,12 +157,30 @@ class Interface(Color,actor.Actor):
         reload(model)
         self.out.write( "\nReload complete" )
 
+    def sync(self):
+        """Sync the world to disk"""
+        self.world.sync()
+
     def run(self):
         """Get a command"""
         while 1:
-            self.prompt()
+            try:
+                self.prompt()
+            except Exception, error:
+                self.out.write( "\nError: %s" % error ) 
+                traceback.print_tb(sys.exc_info()[2])
             #print "interface schedule"
             stackless.schedule()
 
+Interface.commands = {
+             'exit'      : Interface.exit,
+             'sync'      : Interface.sync,
+             '?'         : Interface.help,
+             'help'      : Interface.help,
+             'color'     : Interface.color,
+             'nocolor'   : Interface.nocolor,
+             'objects'   : Interface.objects,
+             'setobject' : Interface.setobject, 
+             'create'    : Interface.create, }
 
 
