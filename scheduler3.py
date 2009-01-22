@@ -39,13 +39,15 @@ class Actor():
 
 
 class Object(Actor):
+
+    messageHandler = { }
     
     def __init__(self,id):
         Actor.__init__(self,id)
-        self.messageHandler = { "UPDATE" : Object.update, "DIE" : Object.die }
+        world.addObject(self)
 
     def update(self,message):
-        print "Update %s"  % ( self.id, )
+        print "Update %s"  % self.id
 
     def die(self,message):
         print "%d died" % self.id
@@ -53,46 +55,58 @@ class Object(Actor):
         self.channel = None
         self.task.kill()
 
-class Scheduler():
+Object.messageHandler = { "UPDATE" : Object.update, "DIE" : Object.die }
 
+class World():
+    
     def __init__(self):
-        self.objects = {}
-        stackless.tasklet(self.sendMessages)()
+        self.world = {} 
+
+    def addObject(self,object):
+        self.world[object.id] = object
+
+    def getObject(self,id):
+        if self.world.has_key(id):
+            return self.world[id]
+        else:
+            return None
+
+    def hasObject(self,id):
+        return self.world.has_key(id)
+
+    def sendMessage(self,id,message):
+        if self.world.has_key(id) and self.world[id].channel:
+                self.world[id].channel.send(message)
+
+class Scheduler(Actor):
+
+    def __init__(self,objects=[]):
+        Actor.__init__(self,0)
+        self.objects = objects[:]
         self.update = Update()
         self.die = Die()
 
+    def addObject(self,id):
+        self.objects.append(id)
+
     def run(self):
-        stackless.run()        
-
-    def addObject(self,object):
-        self.objects[object.id] = object
-
-    def removeObject(self,id=None,object=None):
-        if id:
-            object = self.objects[id]
-        else:
-            id = object.id
-        object.die()
-        del self.objects[id]
-
-    def sendMessages(self):
         while 1:
-            keys = self.objects.keys()
-            random.shuffle(keys)
-            for key in keys:
-                self.objects[key].channel.send(self.update)
-            if len(keys) == 0: break
-            self.objects[keys[0]].channel.send(self.die)
-            del self.objects[keys[0]]
+            random.shuffle(self.objects)
+            for id in self.objects:
+                world.sendMessage(id,self.update)
+            if len(self.objects) == 0: break
+            world.sendMessage(self.objects[-1],self.die)
+            del self.objects[-1]
+
+world = World()
+Object(1)
+Object(2)
+Object(3)
+Object(4)
+Object(5)
+Object(6)
             
-s = Scheduler()
+s = Scheduler([1,2,3,4,5,6])
 
-s.addObject(Object(1))
-s.addObject(Object(2))
-s.addObject(Object(3))
-s.addObject(Object(4))
-s.addObject(Object(5))
-s.addObject(Object(6))
-
-s.run()
+stackless.run()
 
