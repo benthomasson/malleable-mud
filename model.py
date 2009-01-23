@@ -35,6 +35,15 @@ class Object(actor.Actor):
     def applyCommand(self,command,args):
         apply(command,[ self ] + args)
 
+    def __getstate__(self):
+        dict = actor.Actor.__getstate__(self)
+        dict['interface'] = None
+        return dict
+
+    def __setstate__(self,dict):
+        actor.Actor.__setstate__(self,dict)
+        if scheduler: scheduler.addObject(self.id)
+
 class Character(Object):
 
     def __init__(self,name='Nobody'):
@@ -51,17 +60,13 @@ class Character(Object):
     def __str__(self):
         return self.name
 
-    def __setstate__(self,dict):
-        actor.Actor.__setstate__(self,dict)
-        if scheduler: scheduler.addObject(self.id)
-
     def getCommands(self):
         return self.commands.items() + self.mycommands.items()
 
     def say(self,*args):
         """Speak"""
         self.nextAction = Character.doSay
-        self.nextActionArgs = [ reduce(lambda x,y:x+y, args) ]
+        self.nextActionArgs = [ reduce(lambda x,y:x+" "+y, args) ]
 
     def doSay(self,text):
         if self.location: 
@@ -81,9 +86,13 @@ class Character(Object):
     def hear(self,message):
         """Handle a speech message"""
         if self.id == message.srcId:
-            print "You say '%s.'" % message.text
+            self.display( "\nYou say '%s.'" % message.text)
         else:
-            print "%s says '%s.'" % ( message.srcName , message.text )
+            self.display( "\n%s says '%s.'" % ( message.srcName , message.text ))
+
+    def display(self,text):
+        if self.interface:
+            self.interface.display(text)
 
 Character.commands = {  'say' : Character.say,
                         'customize' : Character.customize, 

@@ -20,7 +20,10 @@ s = scheduler.Scheduler(0.1)
 model.world = w
 model.scheduler = s
 
-r = model.Room()
+if w.hasObject('2'):
+    r = w.getObject('2')
+else:
+    r = model.Room()
 
 i.room = r
 

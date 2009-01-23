@@ -91,21 +91,24 @@ class Interface(Color,actor.Actor):
 
     def applyCommand(self,command,args):
         apply(command,[ self ] + args)
-
-    def prompt(self):
+    
+    def writePrompt(self):
         self.out.write( "\n%s%s%s>%s" % (self.red, self.underline, self.object, self.clear ))
         self.out.flush()
+
+    def prompt(self):
+        self.writePrompt()
         commandline = self.cli.getCommand()
         try:
             splitcommand = string.split(commandline)
             if len(splitcommand) == 0: return
             command = self.getCommand(splitcommand[0])
-            if command is not None:
+            if command:
                 self.applyCommand(command,splitcommand[1:])
                 return
-            if self.object is not None: 
+            if self.object:
                 command = self.object.getCommand(splitcommand[0])
-                if command is not None:
+                if command:
                     self.object.applyCommand(command,splitcommand[1:])
                     return
             self.out.write( "\n%sWhat?%s" % (self.red,self.clear) )
@@ -140,7 +143,9 @@ class Interface(Color,actor.Actor):
 
     def setobject(self,x):
         """Change the object you control"""
+        if self.object: self.object.interface = None
         self.object = self.world.getObject(x)
+        if self.object: self.object.interface = self
 
     def create(self,type="Character"):
         """Create a new object"""
@@ -174,6 +179,15 @@ class Interface(Color,actor.Actor):
                 traceback.print_tb(sys.exc_info()[2])
             #print "interface schedule"
             stackless.schedule()
+
+    def display(self,text):
+        self.cli.disableRaw()
+        self.out.write("\n")
+        self.out.write(text)
+        self.out.write("\n")
+        self.out.flush()
+        self.writePrompt()
+        self.cli.enableRaw()
 
 Interface.commands = {
              'exit'      : Interface.exit,
