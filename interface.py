@@ -75,6 +75,7 @@ class Interface(Color,actor.Actor):
         self.world = world
         self.object = None
         self.out = sys.stdout
+        self.room = None
 
     def lookup(self,x, notFound=None):
         if self.memory.has_key(x):
@@ -118,7 +119,7 @@ class Interface(Color,actor.Actor):
     def getCommands(self,prefix):
         commands = []
         commands += self.commands.items()
-        if self.object is not None:
+        if self.object:
             commands += self.object.getCommands()
         return filter(lambda x: x[0].startswith(prefix),commands)
 
@@ -127,7 +128,7 @@ class Interface(Color,actor.Actor):
         self.out.write( "\nCommands: " )
         for (name,command) in sorted(self.commands.items()):
             self.out.write( "\n%-*s - %s" % (10,name,command.__doc__) )
-        if self.object is not None:
+        if self.object:
             for (name,command) in sorted(self.object.getCommands()):
                 self.out.write( "\n%-*s - %s" % (10,name,command.__doc__) )
 
@@ -143,8 +144,10 @@ class Interface(Color,actor.Actor):
 
     def create(self,type="Character"):
         """Create a new object"""
-        self.world.storeObject(eval("model.%s()" % (type,)))
-        self.out.write( "\nDone!" )
+        o = eval("model.%s()" % (type,))
+        if self.room: self.room.addObject(o.id)
+        if self.room: o.location = self.room.id
+        self.out.write( "\nCreated %s %s" % (o, o.id))
 
     def exit(self):
         """Exit the game"""

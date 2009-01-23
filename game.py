@@ -15,10 +15,14 @@ i = interface.Interface(w)
 sandman.Sandman(0.001)
 
 scheduler.world = w
-s = scheduler.Scheduler()
+s = scheduler.Scheduler(0.1)
 
 model.world = w
 model.scheduler = s
+
+r = model.Room()
+
+i.room = r
 
 def reloadCode(self):
     """Reload the code"""
@@ -31,6 +35,8 @@ def reloadCode(self):
     print "Reload complete"
 
 i.commands['reload'] = reloadCode
+
+w.load()
 
 stackless.run()
 

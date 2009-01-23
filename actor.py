@@ -17,7 +17,7 @@ class Actor():
         if self.messageHandler.has_key(message.name):
             apply(self.messageHandler[message.name],[self,message])
         else:
-            print "Unknown message: %s" % message
+            print "%s: Unknown message: %s" % (repr(self),message)
 
     def __getstate__(self):
         dict = self.__dict__.copy()

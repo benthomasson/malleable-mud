@@ -36,6 +36,10 @@ class World():
         if self.world.has_key(id) and self.world[id].channel:
                 self.world[id].channel.send(message)
 
+    def load(self):
+        for x in self.world.keys():
+            self.getObject(x)
+
     def close(self):
         start = time.time()
         self.world.close()
