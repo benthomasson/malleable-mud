@@ -11,13 +11,23 @@ class Actor():
 
     def run(self):
         while 1:
-            self.processMessage(self.channel.receive())
+            message = self.channel.receive()
+            if message.name != "UPDATE":
+                self.processMessage(message)
 
     def processMessage(self,message):
         if self.messageHandler.has_key(message.name):
             apply(self.messageHandler[message.name],[self,message])
         else:
             print "%s: Unknown message: %s" % (repr(self),message)
+
+    def waitForUpdate(self):
+        while 1:
+            message = self.channel.receive()
+            if message.name == "UPDATE":
+                break
+            else:
+                self.processMessage(self,message)
 
     def __getstate__(self):
         dict = self.__dict__.copy()
@@ -30,3 +40,4 @@ class Actor():
         self.channel = stackless.channel()
         self.task = stackless.tasklet(self.run)()
         return
+

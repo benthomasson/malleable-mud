@@ -91,14 +91,20 @@ class Interface(Color,actor.Actor):
 
     def applyCommand(self,command,args):
         apply(command,[ self ] + args)
+
+    def write(self,text):
+        self.out.write(text)
+        self.out.flush()
     
     def writePrompt(self):
-        self.out.write( "\n%s%s%s>%s" % (self.red, self.underline, self.object, self.clear ))
-        self.out.flush()
+        self.write( "\n%s%s%s>%s" % (self.red, self.underline, self.object, self.clear ))
+
+    def getCommandLine(self):
+        return self.cli.getCommand()
 
     def prompt(self):
         self.writePrompt()
-        commandline = self.cli.getCommand()
+        commandline = self.getCommandLine()
         try:
             splitcommand = string.split(commandline)
             if len(splitcommand) == 0: return
@@ -111,10 +117,10 @@ class Interface(Color,actor.Actor):
                 if command:
                     self.object.applyCommand(command,splitcommand[1:])
                     return
-            self.out.write( "\n%sWhat?%s" % (self.red,self.clear) )
+            self.write( "\n%sWhat?%s" % (self.red,self.clear) )
         except Exception, error:
-            self.out.write( "\n%sWhat?%s" % (self.red,self.clear) )
-            self.out.write( "\nError: %s" % error ) 
+            self.write( "\n%sWhat?%s" % (self.red,self.clear) )
+            self.write( "\nError: %s" % error ) 
             traceback.print_tb(sys.exc_info()[2])
         finally:
             pass
@@ -128,18 +134,18 @@ class Interface(Color,actor.Actor):
 
     def help(self):
         """Print the help for commands"""
-        self.out.write( "\nCommands: " )
+        self.write( "\nCommands: " )
         for (name,command) in sorted(self.commands.items()):
-            self.out.write( "\n%-*s - %s" % (10,name,command.__doc__) )
+            self.write( "\n%-*s - %s" % (10,name,command.__doc__) )
         if self.object:
             for (name,command) in sorted(self.object.getCommands()):
-                self.out.write( "\n%-*s - %s" % (10,name,command.__doc__) )
+                self.write( "\n%-*s - %s" % (10,name,command.__doc__) )
 
     def objects(self):
         """Get a list of all the objects"""
-        self.out.write("World Objects\n")
+        self.write("World Objects\n")
         for x in self.world.world.keys():
-            self.out.write( "\n%s: %s" % (x,self.world.getObject(x)) )
+            self.write( "\n%s: %s" % (x,self.world.getObject(x)) )
 
     def setobject(self,x):
         """Change the object you control"""
@@ -152,7 +158,7 @@ class Interface(Color,actor.Actor):
         o = eval("model.%s()" % (type,))
         if self.room: self.room.addObject(o.id)
         if self.room: o.location = self.room.id
-        self.out.write( "\nCreated %s %s" % (o, o.id))
+        self.write( "\nCreated %s %s" % (o, o.id))
 
     def exit(self):
         """Exit the game"""
@@ -163,7 +169,7 @@ class Interface(Color,actor.Actor):
         """Reload the code"""
         reload(cli)
         reload(model)
-        self.out.write( "\nReload complete" )
+        self.write( "\nReload complete" )
 
     def sync(self):
         """Sync the world to disk"""
@@ -175,18 +181,16 @@ class Interface(Color,actor.Actor):
             try:
                 self.prompt()
             except Exception, error:
-                self.out.write( "\nError: %s" % error ) 
+                self.write( "\nError: %s" % error ) 
                 traceback.print_tb(sys.exc_info()[2])
             #print "interface schedule"
             stackless.schedule()
 
     def display(self,text):
         self.cli.disableRaw()
-        self.out.write("\n")
-        self.out.write(text)
-        self.out.write("\n")
-        self.out.flush()
-        self.writePrompt()
+        self.write("\n")
+        self.write(text)
+        self.write("\n")
         self.cli.enableRaw()
 
 Interface.commands = {

@@ -19,9 +19,6 @@ class Object(actor.Actor):
         #print self.__dict__
         #print pickle.dumps(self)
 
-    def update(self,message):
-        pass
-
     def getCommands(self):
         return self.commands.items()
 
@@ -65,23 +62,14 @@ class Character(Object):
 
     def say(self,*args):
         """Speak"""
-        self.nextAction = Character.doSay
-        self.nextActionArgs = [ reduce(lambda x,y:x+" "+y, args) ]
-
-    def doSay(self,text):
+        self.waitForUpdate()
+        text = reduce(lambda x,y:x+" "+y, args)
         if self.location: 
             world.sendMessage(self.location,messages.Speech(self.id,self.name,text))
 
     def customize(self,name,value):
         """Customize an object"""
         self.__dict__[name] = value
-
-    def update(self,message):
-        """Handle an update message"""
-        if self.nextAction: 
-            apply(self.nextAction,[ self ] + self.nextActionArgs)
-            self.nextAction = None
-            self.nextActionArgs = []
 
     def hear(self,message):
         """Handle a speech message"""
@@ -98,8 +86,7 @@ Character.commands = {  'say' : Character.say,
                         'customize' : Character.customize, 
                         'dump' : Character.dump, }
 
-Character.messageHandler = { 'UPDATE' : Character.update,
-                             'SPEECH' : Character.hear, }
+Character.messageHandler = { 'SPEECH' : Character.hear, }
 
 class Room(Object):
 
@@ -118,6 +105,5 @@ class Room(Object):
 
 Room.commands = { 'dump' : Object.dump, }
 
-Room.messageHandler = { 'UPDATE' : Room.update, 
-                        'SPEECH' : Room.broadcast, }
+Room.messageHandler = { 'SPEECH' : Room.broadcast, }
 
