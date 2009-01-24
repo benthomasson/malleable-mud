@@ -76,6 +76,7 @@ class Interface(Color,actor.Actor):
         self.object = None
         self.out = sys.stdout
         self.room = None
+        self.open = True
 
     def lookup(self,x, notFound=None):
         if self.memory.has_key(x):
@@ -177,7 +178,7 @@ class Interface(Color,actor.Actor):
 
     def run(self):
         """Get a command"""
-        while 1:
+        while self.open:
             try:
                 self.prompt()
             except Exception, error:
@@ -194,6 +195,18 @@ class Interface(Color,actor.Actor):
         self.cli.enableRaw()
 
 Interface.commands = {
+             '?'         : Interface.help,
+             'help'      : Interface.help,
+             'color'     : Interface.color,
+             'nocolor'   : Interface.nocolor, }
+
+
+class LocalInterface(Interface):
+
+    def __init__(self,world):
+        Interface.__init__(self,world)
+
+LocalInterface.commands = {
              'exit'      : Interface.exit,
              'sync'      : Interface.sync,
              '?'         : Interface.help,

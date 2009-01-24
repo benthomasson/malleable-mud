@@ -4,6 +4,7 @@ import socket
 import stackless
 import sandman
 import errno
+import interface
 
 class Server():
 
@@ -29,12 +30,12 @@ class Server():
     def close(self):
         self.socket.close()
 
-class TelnetInterface():
+class TelnetInterface(interface.Interface):
 
     def __init__(self,channel):
+        interface.Interface.__init__(self,None)
         self.channel = channel
         self.channel.setblocking(0)
-        self.task = stackless.tasklet(self.run)()
         self.line = ""
     
     def getCommandLine(self):
@@ -48,33 +49,44 @@ class TelnetInterface():
                 self.line += self.readSocket()
 
     def readSocket(self):
-        while True:
+        while 1:
             try:
                 return self.channel.recv ( 128 )
             except socket.error, error:
                 if error[0] == errno.ECONNRESET:
                     self.channel.close()
+                    self.open = False
                     break
                 if error[0] == errno.EPIPE:
                     self.channel.close()
+                    self.open = False
                     break
                 if error[0] != 35:
-                    print error
+                    print "Error:", error
             stackless.schedule()
+
+    def write(self,text):
+        try:
+            self.channel.send(text)
+        except socket.error, error:
+            if error[0] != 35:
+                print error
     
-    def run(self):
-        while True:
-            print ":", self.getCommandLine()
+    def display(self,text):
+        self.write("\n")
+        self.write(text)
+        self.write("\n")
 
+    def exit(self):
+        self.write("Goodbye\n")
+        self.channel.close()
+        self.open = False
 
-s = Server()
-sleep = sandman.Sandman(0.001)
-
-try:
-    stackless.run()
-except KeyboardInterrupt, e:
-    print "KeyboardInterrupt", e
-    s.close()
-
-
+TelnetInterface.commands = {
+             '?'         : interface.Interface.help,
+             'help'      : interface.Interface.help,
+             'color'     : interface.Interface.color,
+             'nocolor'   : interface.Interface.nocolor, 
+             'exit'      : TelnetInterface.exit, 
+             'quit'      : TelnetInterface.exit, }
 

@@ -9,9 +9,12 @@ import scheduler
 import stackless
 import sandman
 import actor
+import telnetinterface
+
+telnetServer = telnetinterface.Server()
 
 w = world.World()       
-i = interface.Interface(w)
+i = interface.LocalInterface(w)
 sandman.Sandman(0.001)
 
 scheduler.world = w
@@ -41,6 +44,9 @@ i.commands['reload'] = reloadCode
 
 w.load()
 
-stackless.run()
+try:
+    stackless.run()
+finally:
+    telnetServer.close()
 
 
