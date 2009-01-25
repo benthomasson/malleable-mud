@@ -8,20 +8,21 @@ import interface
 
 class Server():
 
-    def __init__(self):
+    def __init__(self,world):
         self.socket = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
-        self.socket.bind ( ( 'localhost', 8080 ) )
+        self.socket.bind ( ( 'localhost', 8000 ) )
         self.socket.listen ( 1 )
         self.socket.setblocking(0)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.task = stackless.tasklet(self.run)()
+        self.world = world
 
     def run(self):
         while True:
             try:
                 channel, details = self.socket.accept()
                 print 'We have opened a connection with', details
-                TelnetInterface(channel)
+                TelnetInterface(channel,self.world)
             except socket.error, error:
                 if error[0] != 35:
                     print error
@@ -32,11 +33,12 @@ class Server():
 
 class TelnetInterface(interface.Interface):
 
-    def __init__(self,channel):
-        interface.Interface.__init__(self,None)
+    def __init__(self,channel,world):
+        interface.Interface.__init__(self,world)
         self.channel = channel
         self.channel.setblocking(0)
         self.line = ""
+        self.setobject('3')
     
     def getCommandLine(self):
         while 1:

@@ -58,4 +58,7 @@ class World():
             world.dict.sync()
         print "Sync: ", time.time() - start
 
+    def getACharacter(self):
+        return self.getObject('3')
+
 

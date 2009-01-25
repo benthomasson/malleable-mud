@@ -11,9 +11,9 @@ import sandman
 import actor
 import telnetinterface
 
-telnetServer = telnetinterface.Server()
 
 w = world.World()       
+telnetServer = telnetinterface.Server(w)
 i = interface.LocalInterface(w)
 sandman.Sandman(0.001)
 
