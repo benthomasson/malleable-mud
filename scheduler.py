@@ -14,14 +14,18 @@ class Scheduler(actor.Actor):
         self.objects = []
         self.roundTime = roundTime
         self.update = messages.Update()
+        self.open = True
 
     def addObject(self,id):
         self.objects.append(id)
 
+    def close(self):
+        self.open = False
+
     def run(self):
         global world
         lastTime = time.time()
-        while 1:
+        while self.open:
             if time.time() - lastTime > self.roundTime:
                 lastTime = time.time()
                 for id in self.objects:

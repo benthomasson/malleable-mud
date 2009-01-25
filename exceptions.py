@@ -1,0 +1,6 @@
+
+
+class GameExit():
+    pass
+
+

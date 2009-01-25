@@ -11,6 +11,7 @@ import cli
 import actor
 import messages
 import stackless
+import game.exceptions 
 
 class Color():
 
@@ -161,10 +162,14 @@ class Interface(Color,actor.Actor):
         if self.room: o.location = self.room.id
         self.write( "\nCreated %s %s" % (o, o.id))
 
+    def close(self):
+        self.open = False
+
     def exit(self):
         """Exit the game"""
         self.world.close()
-        sys.exit()
+        self.close()
+        raise game.exceptions.GameExit()
 
     def reload(self):
         """Reload the code"""

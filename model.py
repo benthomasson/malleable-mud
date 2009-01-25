@@ -10,6 +10,9 @@ world = None
 class Object(actor.Actor):
 
     commands = { }
+    mycommands = { }
+    scripts = { }
+    myscripts = { }
 
     def dump(self):
         """Dump debug data to screen"""
@@ -29,7 +32,17 @@ class Object(actor.Actor):
             return self.mycommands[name]
         return None
 
+    def getScript(self,name):
+        if self.scripts.has_key(name):
+            return self.scripts[name]
+        if self.myscripts.has_key(name):
+            return self.myscripts[name]
+        return None
+
     def applyCommand(self,command,args):
+        apply(command,[ self ] + args)
+
+    def runScript(self,script,args):
         apply(command,[ self ] + args)
 
     def __getstate__(self):
@@ -48,6 +61,7 @@ class Character(Object):
         actor.Actor.__init__(self)
         self.name = name
         self.mycommands = { }
+        self.myscripts = { }
         self.nextAction = None
         self.nextActionArgs = []
         self.location = None

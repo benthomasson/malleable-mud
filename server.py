@@ -10,6 +10,7 @@ import stackless
 import sandman
 import actor
 import telnetinterface
+import game.exceptions
 
 
 w = world.World()       
@@ -46,6 +47,8 @@ w.load()
 
 try:
     stackless.run()
+except game.exceptions.GameExit, ge:
+    pass
 finally:
     telnetServer.close()
 
