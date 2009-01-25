@@ -14,13 +14,6 @@ class Object(actor.Actor):
     scripts = { }
     myscripts = { }
 
-    def dump(self):
-        """Dump debug data to screen"""
-        print self.__class__
-        for x in self.__dict__.keys():
-            print "%10s : %s" % (repr(x), repr(self.__dict__[x]))
-        #print self.__dict__
-        #print pickle.dumps(self)
 
     def getCommands(self):
         return self.commands.items()
@@ -65,6 +58,7 @@ class Character(Object):
         self.nextAction = None
         self.nextActionArgs = []
         self.location = None
+        self.interface = None
         if world: world.storeObject(self)
         if scheduler: scheduler.addObject(self.id)
 
@@ -96,6 +90,12 @@ class Character(Object):
         if self.interface:
             self.interface.display(text)
 
+    def dump(self):
+        """Dump debug data to screen"""
+        self.display(repr(self.__class__))
+        for x in self.__dict__.keys():
+            self.display("%10s : %s" % (repr(x), repr(self.__dict__[x])))
+
 Character.commands = {  'say' : Character.say,
                         'customize' : Character.customize, 
                         'dump' : Character.dump, }
@@ -117,7 +117,7 @@ class Room(Object):
         for object in self.objects:
             world.sendMessage(object,message)
 
-Room.commands = { 'dump' : Object.dump, }
+#Room.commands = { 'dump' : Object.dump, }
 
 Room.messageHandler = { 'SPEECH' : Room.broadcast, }
 

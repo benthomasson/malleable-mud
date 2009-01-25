@@ -1,6 +1,7 @@
 #!/usr/local/bin/python
 
 import unittest
+import game
 
 class Test(unittest.TestCase):
 
