@@ -5,7 +5,7 @@ import time
 
 class World():
 
-    def __init__(self,db='world'):
+    def __init__(self,db='world.db'):
         start = time.time()
         self.world = shelve.open(db,writeback=True)
         print "Load: ", time.time() - start
