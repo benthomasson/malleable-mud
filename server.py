@@ -19,8 +19,7 @@ class Server():
         localInterface = game.interface.LocalInterface(world)
         game.sandman.Sandman(0.001)
 
-        game.scheduler.world = world
-        scheduler = game.scheduler.Scheduler(0.1)
+        scheduler = game.scheduler.Scheduler(0.1,world)
 
         game.model.world = world
         game.model.scheduler = scheduler
@@ -57,8 +56,7 @@ class TestServer(Server):
 
     def __init__(self):
         self.world = game.world.TestWorld()       
-        game.scheduler.world = self.world
-        self.scheduler = game.scheduler.Scheduler(0)
+        self.scheduler = game.scheduler.Scheduler(0,self.world)
         game.model.world = self.world
         game.model.scheduler = self.scheduler
         

@@ -5,16 +5,15 @@ import messages
 import actor
 import time
 
-world = None
-
 class Scheduler(actor.Actor):
 
-    def __init__(self,roundTime=1):
+    def __init__(self,roundTime,world):
         actor.Actor.__init__(self)
         self.objects = []
         self.roundTime = roundTime
         self.update = messages.Update()
         self.open = True
+        self.world = world
 
     def addObject(self,id):
         self.objects.append(id)
@@ -23,12 +22,11 @@ class Scheduler(actor.Actor):
         self.open = False
 
     def run(self):
-        global world
         lastTime = time.time()
         while self.open:
             if time.time() - lastTime > self.roundTime or not self.roundTime:
                 lastTime = time.time()
                 for id in self.objects:
-                    world.sendMessage(id,self.update)
+                    self.world.sendMessage(id,self.update)
             stackless.schedule()
                 

@@ -22,7 +22,7 @@ class Test(unittest.TestCase):
         o.location = room.id
         self.assertEquals(o.location,room.id)
         self.assertEquals(room.objects,[o.id])
-        
+    
 
 if __name__ == '__main__':
     unittest.main()
