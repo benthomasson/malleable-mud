@@ -11,6 +11,7 @@ class Test(unittest.TestCase):
         server = game.server.TestServer()
         self.assertTrue(server.world)
         self.assertTrue(server.scheduler)
+        server.scheduler.close()
     
     def testCreate(self):
         server = game.server.TestServer()
@@ -22,6 +23,7 @@ class Test(unittest.TestCase):
         o.location = room.id
         self.assertEquals(o.location,room.id)
         self.assertEquals(room.objects,[o.id])
+        server.scheduler.close()
 
     def testScheduler(self):
         server = game.server.TestServer()
@@ -39,4 +41,6 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
 

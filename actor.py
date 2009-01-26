@@ -41,3 +41,26 @@ class Actor():
         self.task = stackless.tasklet(self.run)()
         return
 
+
+class TestableActor(Actor):
+
+    def __init__(self):
+        Actor.__init__(self)
+        self.messages = []
+        self.steps = 0
+
+    def run(self):
+        while 1:
+            message = self.channel.receive()
+            self.steps+=1
+            if message.name != "UPDATE":
+                self.processMessage(message)
+
+    def processMessage(self,message):
+        self.messages.append(message)
+        if self.messageHandler.has_key(message.name):
+            apply(self.messageHandler[message.name],[self,message])
+
+        
+
+    
