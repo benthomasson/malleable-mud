@@ -14,23 +14,23 @@ import game.exceptions
 class Server():
 
     def __init__(self):
-        w = game.world.World()       
-        telnetServer = game.telnetinterface.Server(w)
-        i = game.interface.LocalInterface(w)
+        world = game.world.World()       
+        telnetServer = game.telnetinterface.Server(world)
+        localInterface = game.interface.LocalInterface(world)
         game.sandman.Sandman(0.001)
 
-        game.scheduler.world = w
-        s = game.scheduler.Scheduler(0.1)
+        game.scheduler.world = world
+        scheduler = game.scheduler.Scheduler(0.1)
 
-        game.model.world = w
-        game.model.scheduler = s
+        game.model.world = world
+        game.model.scheduler = scheduler
 
-        if w.hasObject('2'):
-            r = w.getObject('2')
+        if world.hasObject('2'):
+            room = world.getObject('2')
         else:
-            r = game.model.Room()
+            room = game.model.Room()
 
-        i.room = r
+        localInterface.room = room
 
         def reloadCode(self):
             """Reload the code"""
@@ -42,9 +42,9 @@ class Server():
             reload(sandman)
             print "Reload complete"
 
-        i.commands['reload'] = reloadCode
+        localInterface.commands['reload'] = reloadCode
 
-        w.load()
+        world.load()
 
         try:
             stackless.run()
@@ -52,6 +52,16 @@ class Server():
             pass
         finally:
             telnetServer.close()
+
+class TestServer(Server):
+
+    def __init__(self):
+        self.world = game.world.TestWorld()       
+        game.scheduler.world = self.world
+        self.scheduler = game.scheduler.Scheduler(0)
+        game.model.world = self.world
+        game.model.scheduler = self.scheduler
+        
 
 if __name__ == '__main__':
     Server()

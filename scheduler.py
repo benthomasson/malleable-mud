@@ -26,7 +26,7 @@ class Scheduler(actor.Actor):
         global world
         lastTime = time.time()
         while self.open:
-            if time.time() - lastTime > self.roundTime:
+            if time.time() - lastTime > self.roundTime or not self.roundTime:
                 lastTime = time.time()
                 for id in self.objects:
                     world.sendMessage(id,self.update)

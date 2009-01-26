@@ -62,3 +62,18 @@ class World():
         return self.getObject('3')
 
 
+class TestWorld(World):
+
+    def __init__(self,db='world'):
+        start = time.time()
+        self.world = { }
+        print "Load: ", time.time() - start
+        self.world['nextId'] = 1
+
+    def close(self):
+        pass
+
+    def sync(self):
+        sync
+
+
