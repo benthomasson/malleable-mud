@@ -59,7 +59,6 @@ class TestServer(Server):
         self.scheduler = game.scheduler.Scheduler(0,self.world)
         game.model.world = self.world
         game.model.scheduler = self.scheduler
-        
 
 if __name__ == '__main__':
     Server()
