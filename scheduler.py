@@ -11,7 +11,6 @@ class Scheduler(actor.Actor):
         actor.Actor.__init__(self)
         self.objects = []
         self.roundTime = roundTime
-        self.update = messages.Update()
         self.open = True
         self.world = world
         self.steps = 0
@@ -30,7 +29,7 @@ class Scheduler(actor.Actor):
                 lastTime = time.time()
                 self.steps+=1
                 for id in self.objects:
-                    self.world.sendMessage(id,self.update)
+                    self.world.sendMessage(id,messages.update)
             stackless.schedule()
                 
 
