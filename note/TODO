@@ -1,19 +1,19 @@
 
 TODO
 
-* InvestigateStacklessPython
-* ActorModel
-* TelnetServer
+* ScriptInterpreter
 * QuestionMarkHelp
-* BasicEventScheduler
 * PlayerCommands
 * CreationCommands
 * CustomizationCommands
 
 
-
 DONE
 
+* BasicEventScheduler
+* TelnetServer
+* ActorModel
+* InvestigateStacklessPython
 * ReloadCode
 * CliTabCompletion
 

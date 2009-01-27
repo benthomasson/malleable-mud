@@ -9,6 +9,16 @@ as soon as possible before getting into MUD coding.   So this is probably a good
 Stackless is awesome.   Stackless can be used as the scheduler for the game itself.  Each object will have a run method
 that will get scheduled to run.
 
+---
+
+Each objects has a run method that blocks on its channel and waits for methods.   Special objects can override
+the run method and do other things.    Also Each object implements waitForUpdate which allows stepped execution
+of the code.  waitForUpdate will block the task until it receives an update message.  This allows for commands
+to synchronize to the main clock(aka game.scheduler.Scheduler for now).
+
+
+
+
 
 
 

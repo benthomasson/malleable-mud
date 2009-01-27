@@ -4,3 +4,13 @@ ActorModel
 Implement the ActorModel as the architecture for MM.  This will work well both for pickling and for stackless.
 
 
+---
+
+game.model.Objects now use the actor model and send messages to each other instead of interacting directly
+
+This allows for pickling individual objects.  Stackless channels are used to pass the messages.  Each object
+is its own tasklet.    This works out very well.
+
+
+
+

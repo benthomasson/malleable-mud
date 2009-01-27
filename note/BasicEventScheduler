@@ -3,4 +3,10 @@ BasicEventScheduler
 
 Build a basic event scheduler that polls objects for actions to complete.  Objects could schedule when to poll them again to reduce polling load.
 
+----
+
+The stackless round-robin scheduler will be the primary scheduler.   Further scheduling is done by using waitForUpdate and sending update messages
+to each object.  For now each object gets an update message each round.   It may be possible to have a multiple round scheduler in the future for
+objects that update more slowly.
+
 

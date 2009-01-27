@@ -25,20 +25,6 @@ class Test(unittest.TestCase):
         self.assertEquals(room.objects,[o.id])
         server.scheduler.close()
 
-    def testScheduler(self):
-        server = game.server.TestServer()
-        self.assertTrue(server.world)
-        self.assertTrue(server.scheduler)
-        self.assertEquals(server.scheduler.steps,0)
-        stackless.schedule()
-        self.assertEquals(server.scheduler.steps,1)
-        stackless.schedule()
-        self.assertEquals(server.scheduler.steps,2)
-        stackless.schedule()
-        self.assertEquals(server.scheduler.steps,3)
-        server.scheduler.close()
-    
-
 if __name__ == '__main__':
     unittest.main()
 
