@@ -19,7 +19,7 @@ class Server():
         localInterface = game.interface.LocalInterface(world)
         game.sandman.Sandman(0.001)
 
-        scheduler = game.scheduler.Scheduler(0.1,world)
+        scheduler = game.scheduler.Scheduler(0.001,world)
 
         game.model.world = world
         game.model.scheduler = scheduler

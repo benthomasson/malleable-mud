@@ -117,7 +117,7 @@ class Interface(Color,actor.Actor):
             if self.object:
                 command = self.object.getCommand(splitcommand[0])
                 if command:
-                    self.object.applyCommand(command,splitcommand[1:])
+                    self.object.updateCommand = [ command ] + splitcommand[1:]
                     return
             self.write( "\n%sWhat?%s" % (self.red,self.clear) )
         except Exception, error:
@@ -197,6 +197,7 @@ class Interface(Color,actor.Actor):
         self.write("\n")
         self.write(text)
         self.write("\n")
+        self.writePrompt()
         self.cli.enableRaw()
 
 Interface.commands = {

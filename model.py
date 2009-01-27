@@ -14,6 +14,9 @@ class Object(actor.Actor):
     scripts = { }
     myscripts = { }
 
+    def __init__(self):
+        actor.Actor.__init__(self)
+        self.updateCommand = None
 
     def getCommands(self):
         return self.commands.items()
@@ -35,8 +38,12 @@ class Object(actor.Actor):
     def applyCommand(self,command,args):
         apply(command,[ self ] + args)
 
-    def runScript(self,script,args):
-        apply(command,[ self ] + args)
+    def update(self):
+        if self.updateCommand:
+            try:
+                self.applyCommand(self.updateCommand[0],self.updateCommand[1:])
+            finally:
+                self.updateCommand = None
 
     def __getstate__(self):
         dict = actor.Actor.__getstate__(self)
@@ -51,7 +58,7 @@ class Character(Object):
 
     def __init__(self,name='Nobody'):
         global scheduler, world
-        actor.Actor.__init__(self)
+        Object.__init__(self)
         self.name = name
         self.mycommands = { }
         self.myscripts = { }
@@ -105,7 +112,7 @@ Character.messageHandler = { 'SPEECH' : Character.hear, }
 class Room(Object):
 
     def __init__(self):
-        actor.Actor.__init__(self)
+        Object.__init__(self)
         self.objects = []
         if world: world.storeObject(self)
         if scheduler: scheduler.addObject(self.id)

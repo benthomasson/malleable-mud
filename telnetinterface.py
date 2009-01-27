@@ -78,6 +78,7 @@ class TelnetInterface(interface.Interface):
         self.write("\n")
         self.write(text)
         self.write("\n")
+        self.writePrompt()
 
     def exit(self):
         self.write("Goodbye\n")

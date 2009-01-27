@@ -12,8 +12,13 @@ class Actor():
     def run(self):
         while 1:
             message = self.channel.receive()
-            if message.name != "UPDATE":
+            if message.name == "UPDATE":
+                self.update()
+            else:
                 self.processMessage(message)
+
+    def update(self):
+        pass
 
     def processMessage(self,message):
         if self.messageHandler.has_key(message.name):
